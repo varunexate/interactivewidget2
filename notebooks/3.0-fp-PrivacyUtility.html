@@ -12940,6 +12940,15 @@ ul.typeahead-list  > li > a.pull-right {
 .terminal-app #terminado-container {
   margin-top: 20px;
 }
+
+.widget-hslider {
+  padding:50px 0px;
+  position: relative;
+    bottom: 52px;
+;
+  	}
+	
+
 /*# sourceMappingURL=style.min.css.map */
     </style>
 <style type="text/css">
@@ -13043,6 +13052,8 @@ div#notebook {
     display: block;
     page-break-inside: avoid;
   }
+  
+  
 }
 </style>
 
@@ -13134,6 +13145,8 @@ div#notebook {
 
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">interact</span><span class="p">,</span> <span class="n">IntSlider</span><span class="p">,</span> <span class="n">widgets</span>
+<span class="kn">import</span> <span class="nn">PIL</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
 </pre></div>
 
     </div>
@@ -13251,18 +13264,6 @@ div#notebook {
 
 <span class="n">dfs</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">meassure_supression</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">step_size</span><span class="p">):</span>
-    <span class="n">QID</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Age (QID)&#39;</span><span class="p">,</span> <span class="s1">&#39;Gender (QID)&#39;</span><span class="p">]</span> <span class="c1"># define quasi-identifyer groups</span>
-    
-    <span class="n">dfs</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;Age (QID)&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">step_size</span><span class="p">))</span><span class="o">*</span><span class="n">step_size</span>
-    <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;Age (QID)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">step_size</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-    <span class="n">dfs</span> <span class="o">=</span> <span class="n">dfs</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">])</span>
-
-    <span class="n">orig_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="n">new_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dfs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">QID</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">k</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d%%</span><span class="s2"> of data supressed to achieve privacy&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(((</span><span class="n">orig_length</span> <span class="o">-</span> <span class="n">new_length</span><span class="p">)</span> <span class="o">/</span> <span class="n">orig_length</span><span class="p">)</span><span class="o">*</span> <span class="mi">100</span><span class="p">)))</span>
 
 <span class="k">def</span> <span class="nf">generalise_supress</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">step_size</span><span class="p">):</span>
     <span class="n">dfs</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -13273,7 +13274,6 @@ div#notebook {
     <span class="n">QID</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Age (QID)&#39;</span><span class="p">,</span> <span class="s1">&#39;Gender (QID)&#39;</span><span class="p">]</span>
     <span class="n">index</span> <span class="o">=</span> <span class="n">dfs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">QID</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&lt;</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
     <span class="n">dfs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;----------&#39;</span>
-<span class="c1">#     display(dfs)</span>
     <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">dfs</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)))</span>
 
     
@@ -13289,23 +13289,64 @@ div#notebook {
     <span class="n">gil</span> <span class="o">=</span> <span class="n">GIL</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">step_size</span><span class="p">)</span> <span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;Age (QID)&#39;</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;Age (QID)&#39;</span><span class="p">]))</span>
     <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;Age (QID)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">step_size</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
    
+    <span class="n">orig_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">new_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dfs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">QID</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">k</span><span class="p">))</span>
+    
     <span class="n">dfs</span> <span class="o">=</span> <span class="n">dfs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">QID</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">k</span><span class="p">)</span>
     <span class="n">quid_groupsize</span> <span class="o">=</span> <span class="n">dfs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">QID</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
     <span class="n">k_val</span> <span class="o">=</span> <span class="n">quid_groupsize</span><span class="p">[</span><span class="n">quid_groupsize</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">k_val</span><span class="p">):</span> <span class="n">k_val</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;k-annonymity has a value of k = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span><span class="k">k_val</span>)
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generalised information loss = </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span><span class="k">gil</span>)
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;PRIVACY -&gt; k-annonymity = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span><span class="k">k_val</span>)
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;UTILITY -&gt; percentage suppressed </span><span class="si">%d%%</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(((</span><span class="n">orig_length</span> <span class="o">-</span> <span class="n">new_length</span><span class="p">)</span> <span class="o">/</span> <span class="n">orig_length</span><span class="p">)</span><span class="o">*</span> <span class="mi">100</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;UTILITY -&gt; generalisation information loss = </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span><span class="k">gil</span>)
 
     
-<span class="n">out1</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">interactive_output</span><span class="p">(</span><span class="n">meassure_supression</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;step_size&#39;</span><span class="p">:</span> <span class="n">step_size</span><span class="p">})</span>
+<span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">step_size</span><span class="p">):</span>
+    <span class="n">dfs</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;Age (QID)&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">step_size</span><span class="p">))</span><span class="o">*</span><span class="n">step_size</span>
+    <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;Age (QID)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">step_size</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">dfs</span> <span class="o">=</span> <span class="n">dfs</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ranged&#39;</span><span class="p">])</span>
+    <span class="n">QID</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Age (QID)&#39;</span><span class="p">,</span> <span class="s1">&#39;Gender (QID)&#39;</span><span class="p">]</span>
+  
+    <span class="n">orig_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">new_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dfs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">QID</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">k</span><span class="p">))</span>
+    
+    <span class="n">dfs</span> <span class="o">=</span> <span class="n">dfs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">QID</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">quid_groupsize</span> <span class="o">=</span> <span class="n">dfs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">QID</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">k_val</span> <span class="o">=</span> <span class="n">quid_groupsize</span><span class="p">[</span><span class="n">quid_groupsize</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    
+    <span class="n">perc_loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">orig_length</span> <span class="o">-</span> <span class="n">new_length</span><span class="p">)</span> <span class="o">/</span> <span class="n">orig_length</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">perc_step</span> <span class="o">=</span> <span class="n">step_size</span> <span class="o">/</span> <span class="mi">40</span> <span class="o">*</span> <span class="mi">100</span> 
+    <span class="n">utility_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">perc_loss</span> <span class="o">+</span> <span class="n">perc_step</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">k_val</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">privacy_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_val</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span> 
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">privacy_index</span> <span class="o">=</span> <span class="mi">100</span>
+    
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">([</span><span class="mi">100</span><span class="o">-</span><span class="n">utility_index</span><span class="p">],</span> <span class="mi">0</span> <span class="p">,</span> <span class="mi">100</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#2ca7d7&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">privacy_index</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#002f91&#39;</span><span class="p">)</span> 
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">102</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;Utility&quot;</span><span class="p">,</span> <span class="s2">&quot;Privacy&quot;</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;Bad&quot;</span><span class="p">,</span> <span class="s2">&quot;Good&quot;</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+
 <span class="n">out2</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">interactive_output</span><span class="p">(</span><span class="n">generalise_supress</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;step_size&#39;</span><span class="p">:</span> <span class="n">step_size</span><span class="p">})</span>
 
 <span class="n">out3</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">interactive_output</span><span class="p">(</span><span class="n">label_age</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;step_size&#39;</span><span class="p">:</span> <span class="n">step_size</span><span class="p">})</span>
 <span class="n">out4</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">interactive_output</span><span class="p">(</span><span class="n">meassure_k</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;step_size&#39;</span><span class="p">:</span> <span class="n">step_size</span><span class="p">})</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">interactive_output</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;step_size&#39;</span><span class="p">:</span> <span class="n">step_size</span><span class="p">})</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Set minimum privacy value with k-annonymity:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Set minimum privacy value with k-anonymity:&#39;</span><span class="p">)</span>
 <span class="n">display</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-<span class="n">display</span><span class="p">(</span><span class="n">out1</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
@@ -13313,9 +13354,12 @@ div#notebook {
 <span class="n">display</span><span class="p">(</span><span class="n">step_size</span><span class="p">)</span>
 <span class="n">display</span><span class="p">(</span><span class="n">out3</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="n">display</span><span class="p">(</span><span class="n">out4</span><span class="p">)</span>
+
+
+<span class="n">display</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
 <span class="n">display</span><span class="p">(</span><span class="n">out2</span><span class="p">)</span>
 </pre></div>
 
@@ -13332,72 +13376,24 @@ div#notebook {
     
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Set minimum privacy value with k-annonymity:
-</pre>
-</div>
-</div>
+	<b>Set minimum privacy value with k-anonymity :</b>
 
-<div class="output_area">
+<br>
 
-    
-
-
-
-  <div class="output_subarea output_widget_view ">
-    <button class="js-nbinteract-widget">
-      Loading widgets...
-    </button>
-  </div>
-
-</div>
-
-<div class="output_area">
-
-    
-
-
-
-  <div class="output_subarea output_widget_view ">
-    <button class="js-nbinteract-widget">
-      Loading widgets...
-    </button>
-  </div>
-
-</div>
-
-<div class="output_area">
-
-    
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-
-Set age generalisation step size
-</pre>
 </div>
 </div>
 
 <div class="output_area">
-
     
 
 
 
-  <div class="output_subarea output_widget_view ">
-    <button class="js-nbinteract-widget">
-      Loading widgets...
-    </button>
-  </div>
+  <div class="output_subarea output_widget_view " style="overflow:hidden;">
+  
 
-</div>
+<span style="position:relative;top:75px;"><b>Set age generalisation step size :</b></span>
 
-<div class="output_area">
-
-    
-
-
-
-  <div class="output_subarea output_widget_view ">
+<br>
     <button class="js-nbinteract-widget">
       Loading widgets...
     </button>
@@ -13410,10 +13406,50 @@ Set age generalisation step size
     
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
 
-</pre>
 </div>
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
 </div>
 
 <div class="output_area">
